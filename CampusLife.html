@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Campus Life | Shri Ganpati Institute of Pharmacy</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Campus life, activities, students, events and facilities at Shri Ganpati Institute of Pharmacy." name="description">
+
+    <link href="img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="npm/bootstrap-icons%401.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        .campus-gallery-card {
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .campus-gallery-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .campus-gallery-card .card-caption {
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .campus-pagination .page-link {
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        .campus-pagination .page-item.active .page-link {
+            color: #fff;
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .campus-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 100001;
+            display: grid;
+            place-items: center;
+            padding: 1rem;
+            background: rgba(7, 17, 43, .92);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .3s ease, visibility 0s linear .3s;
+        }
+
+        .campus-lightbox.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s;
+        }
+
+        .campus-lightbox__content {
+            position: relative;
+            width: min(100%, 1100px);
+            text-align: center;
+        }
+
+        .campus-lightbox__image {
+            display: block;
+            width: 100%;
+            max-height: 82vh;
+            object-fit: contain;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, .5);
+        }
+
+        .campus-lightbox__button {
+            position: fixed;
+            top: 50%;
+            width: 48px;
+            height: 48px;
+            margin-top: -24px;
+            border: 1px solid rgba(255, 255, 255, .7);
+            color: #fff;
+            background: rgba(0, 0, 0, .4);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .campus-lightbox__button:hover,
+        .campus-lightbox__button:focus {
+            color: #fff;
+            background: var(--primary);
+        }
+
+        .campus-lightbox__previous {
+            left: 1.5rem;
+        }
+
+        .campus-lightbox__next {
+            right: 1.5rem;
+        }
+
+        .campus-lightbox__close {
+            position: absolute;
+            top: -3.25rem;
+            right: 0;
+            width: 42px;
+            height: 42px;
+            border: 0;
+            color: #fff;
+            background: transparent;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .campus-lightbox__caption {
+            margin-top: .75rem;
+            color: #fff;
+            font-size: .95rem;
+        }
+
+        @media (max-width: 575.98px) {
+            .campus-gallery-card img {
+                height: 210px;
+            }
+
+            .campus-lightbox__button {
+                position: absolute;
+                top: auto;
+                bottom: -4rem;
+                margin-top: 0;
+            }
+
+            .campus-lightbox__previous {
+                left: calc(50% - 58px);
+            }
+
+            .campus-lightbox__next {
+                right: calc(50% - 58px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <h2 class="m-0 text-primary"><i class="fa fa-university me-3"></i><span class="class_college_name_short">SGIP</span></h2>
+        </a>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                <a href="index.html" class="nav-item nav-link">Home</a>
+                <a href="about.html" class="nav-item nav-link">About</a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Gallery</a>
+                    <div class="dropdown-menu fade-down m-0">
+                        <a href="gallery.html" class="dropdown-item">Gallery</a>
+                        <a href="CampusLife.html" class="dropdown-item active">Campus Life</a>
+                        <a href="Facilities.html" class="dropdown-item">Facilities &amp; Laboratories</a>
+                        <a href="Events.html" class="dropdown-item">Events &amp; Celebrations</a>
+                        <a href="Achievements.html" class="dropdown-item">Achievements &amp; Toppers</a>
+                        <a href="StudentActivities.html" class="dropdown-item">Student Activities</a>
+                        <!-- <a href="Alumni.html" class="dropdown-item">Alumni</a>
+                        <a href="Admissions.html" class="dropdown-item">Admissions</a>
+                        <a href="VirtualCampus.html" class="dropdown-item">360 Virtual Campus</a>
+                        <a href="Faculty.html" class="dropdown-item">Faculty &amp; Staff</a> -->
+                    </div>
+                </div>
+                <a href="courses.html" class="nav-item nav-link">Courses</a>
+                <a href="grievance.html" class="nav-item nav-link">Grievance</a>
+                <a href="contact.html" class="nav-item nav-link">Contact</a>
+            </div>
+            <a href="https://dgpm.nic.in/stud_registration.do" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Student PCI-Reg<i class="fa fa-arrow-right ms-3"></i></a>
+        </div>
+    </nav>
+
+    <div class="container-fluid bg-primary py-5 mb-5 page-header">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 text-center">
+                    <h1 class="display-3 text-white animated slideInDown">Campus Life</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb justify-content-center">
+                            <li class="breadcrumb-item"><a class="text-white" href="index.html">Home</a></li>
+                            <li class="breadcrumb-item text-white active" aria-current="page">Campus Life</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h6 class="section-title bg-white text-center text-primary px-3">Our Campus</h6>
+                <h1 class="mb-3">Life at SGIP</h1>
+                <p class="mb-0">Explore the people, activities, events, and everyday moments that make our campus special.</p>
+            </div>
+            <div id="campusGallery" class="row g-4" aria-live="polite"></div>
+            <nav class="mt-5" aria-label="Campus life pages">
+                <ul id="campusPagination" class="pagination campus-pagination justify-content-center mb-0"></ul>
+            </nav>
+        </div>
+    </main>
+
+    <div id="campusLightbox" class="campus-lightbox" role="dialog" aria-modal="true" aria-label="Campus life image viewer">
+        <div class="campus-lightbox__content">
+            <button id="campusClose" class="campus-lightbox__close" type="button" aria-label="Close image viewer"><i class="bi bi-x-lg"></i></button>
+            <img id="campusLightboxImage" class="campus-lightbox__image" src="" alt="">
+            <p id="campusLightboxCaption" class="campus-lightbox__caption mb-0"></p>
+        </div>
+        <button id="campusPrevious" class="campus-lightbox__button campus-lightbox__previous" type="button" aria-label="Previous image"><i class="bi bi-chevron-left"></i></button>
+        <button id="campusNext" class="campus-lightbox__button campus-lightbox__next" type="button" aria-label="Next image"><i class="bi bi-chevron-right"></i></button>
+    </div>
+
+    <footer class="container-fluid bg-dark text-light py-4">
+        <div class="container text-center">
+            <span>&copy; <span class="class_college_name_short">SGIP</span>, All Right Reserved.</span>
+        </div>
+    </footer>
+
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="npm/bootstrap%405.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            var campusImages = ["IMG-20260716-WA0044.jpeg","IMG-20260719-WA0029.jpeg","IMG-20260719-WA0036.jpeg","IMG-20260722-WA0006.jpeg","IMG-20260722-WA0012.jpeg","IMG-20260914-WA0028.jpeg","IMG-20260914-WA0029.jpeg","IMG-20260914-WA0032.jpeg","IMG_20260722_005111.jpeg","IMG_20260722_133302.jpeg","IMG_20260914_182754.jpeg","kuldeep.jpeg","mamta.jpeg","monu.jpeg","Snapchat-437944203.jpeg","Snapchat-550441717.jpeg","Snapchat-668357809.jpeg"];
+            var pageSize = 9;
+            var currentPage = 1;
+            var currentImage = 0;
+            var slideshowTimer;
+            var gallery = document.getElementById('campusGallery');
+            var pagination = document.getElementById('campusPagination');
+            var lightbox = document.getElementById('campusLightbox');
+            var lightboxImage = document.getElementById('campusLightboxImage');
+            var lightboxCaption = document.getElementById('campusLightboxCaption');
+
+            function imagePath(index) {
+                return 'img/CampusLife/' + campusImages[index];
+            }
+
+            function imageLabel(index) {
+                return campusImages[index].replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+            }
+
+            function renderGallery() {
+                var start = (currentPage - 1) * pageSize;
+                var end = Math.min(start + pageSize, campusImages.length);
+                var cards = '';
+
+                for (var index = start; index < end; index += 1) {
+                    cards += '<div class="col-lg-4 col-md-6">' +
+                        '<button class="course-item bg-light campus-gallery-card border-0 w-100 p-0" type="button" data-image-index="' + index + '">' +
+                        '<div class="position-relative overflow-hidden"><img src="' + imagePath(index) + '" alt="Campus life: ' + imageLabel(index) + '"></div>' +
+                        '<div class="card-caption px-3">' + imageLabel(index) + '</div>' +
+                        '</button>' +
+                        '</div>';
+                }
+
+                gallery.innerHTML = cards;
+                gallery.querySelectorAll('[data-image-index]').forEach(function (card) {
+                    card.addEventListener('click', function () {
+                        openLightbox(Number(card.getAttribute('data-image-index')));
+                    });
+                });
+                renderPagination();
+            }
+
+            function renderPagination() {
+                var totalPages = Math.ceil(campusImages.length / pageSize);
+                var links = '';
+
+                if (totalPages > 1) {
+                    links += '<li class="page-item ' + (currentPage === 1 ? 'disabled' : '') + '"><button class="page-link" type="button" data-page="' + (currentPage - 1) + '" aria-label="Previous page">&laquo;</button></li>';
+                    for (var page = 1; page <= totalPages; page += 1) {
+                        links += '<li class="page-item ' + (page === currentPage ? 'active' : '') + '"><button class="page-link" type="button" data-page="' + page + '">' + page + '</button></li>';
+                    }
+                    links += '<li class="page-item ' + (currentPage === totalPages ? 'disabled' : '') + '"><button class="page-link" type="button" data-page="' + (currentPage + 1) + '" aria-label="Next page">&raquo;</button></li>';
+                }
+
+                pagination.innerHTML = links;
+                pagination.querySelectorAll('[data-page]').forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        var requestedPage = Number(link.getAttribute('data-page'));
+                        if (requestedPage >= 1 && requestedPage <= totalPages && requestedPage !== currentPage) {
+                            currentPage = requestedPage;
+                            renderGallery();
+                            window.scrollTo({ top: gallery.offsetTop - 100, behavior: 'smooth' });
+                        }
+                    });
+                });
+            }
+
+            function showImage(index) {
+                currentImage = (index + campusImages.length) % campusImages.length;
+                lightboxImage.src = imagePath(currentImage);
+                lightboxImage.alt = 'Campus life: ' + imageLabel(currentImage);
+                lightboxCaption.textContent = (currentImage + 1) + ' of ' + campusImages.length + ' - ' + imageLabel(currentImage);
+            }
+
+            function startSlideshow() {
+                window.clearInterval(slideshowTimer);
+                slideshowTimer = window.setInterval(function () {
+                    showImage(currentImage + 1);
+                }, 5000);
+            }
+
+            function openLightbox(index) {
+                showImage(index);
+                lightbox.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+                startSlideshow();
+            }
+
+            function closeLightbox() {
+                lightbox.classList.remove('is-open');
+                document.body.style.overflow = '';
+                window.clearInterval(slideshowTimer);
+            }
+
+            document.getElementById('campusPrevious').addEventListener('click', function () {
+                showImage(currentImage - 1);
+                startSlideshow();
+            });
+            document.getElementById('campusNext').addEventListener('click', function () {
+                showImage(currentImage + 1);
+                startSlideshow();
+            });
+            document.getElementById('campusClose').addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', function (event) {
+                if (event.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+            document.addEventListener('keydown', function (event) {
+                if (!lightbox.classList.contains('is-open')) {
+                    return;
+                }
+                if (event.key === 'Escape') {
+                    closeLightbox();
+                } else if (event.key === 'ArrowLeft') {
+                    showImage(currentImage - 1);
+                    startSlideshow();
+                } else if (event.key === 'ArrowRight') {
+                    showImage(currentImage + 1);
+                    startSlideshow();
+                }
+            });
+
+            var loadCampusManifest = window.location.protocol === 'file:'
+                ? Promise.resolve()
+                : fetch('gallery-manifest.json', { cache: 'no-store' })
+                    .then(function (response) { return response.ok ? response.json() : Promise.reject(new Error('Manifest unavailable')); })
+                    .then(function (manifest) {
+                        if (Array.isArray(manifest.CampusLife)) {
+                            campusImages = manifest.CampusLife;
+                        }
+                    })
+                    .catch(function () {
+                        // Keep the inline list when the JSON file is unavailable.
+                    });
+
+            loadCampusManifest.then(function () {
+                renderGallery();
+                openLightbox(Math.floor(Math.random() * campusImages.length));
+            });
+        }());
+    </script>
+</body>
+
+</html>

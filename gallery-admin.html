@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Gallery File Manager | SGIP</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="npm/bootstrap-icons%401.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        .gallery-admin {
+            max-width: 900px;
+        }
+
+        .gallery-admin__list {
+            min-height: 140px;
+            padding: 1rem;
+            background: var(--light);
+            border: 1px solid #dee2e6;
+        }
+
+        .gallery-admin__item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: .65rem .75rem;
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .gallery-admin__item:last-child {
+            border-bottom: 0;
+        }
+
+        .gallery-admin__empty {
+            color: #6c757d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <h2 class="m-0 text-primary"><i class="fa fa-university me-3"></i><span class="class_college_name_short">SGIP</span></h2>
+        </a>
+        <div class="navbar-nav ms-auto p-4 p-lg-0 me-4">
+            <a href="index.html" class="nav-item nav-link">Home</a>
+            <a href="gallery.html" class="nav-item nav-link">Gallery</a>
+        </div>
+    </nav>
+
+    <main class="container-xxl py-5">
+        <div class="container gallery-admin">
+            <div class="text-center mb-5">
+                <h6 class="section-title bg-white text-center text-primary px-3">Static File Manager</h6>
+                <h1 class="mb-3">Gallery Manifest</h1>
+                <p class="mb-0">Add or remove filenames, then download the updated JSON file for Cloudflare.</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" for="galleryCategory">Gallery folder</label>
+                <select id="galleryCategory" class="form-select">
+                    <option value="Gallery">Gallery</option>
+                    <option value="CampusLife">Campus Life</option>
+                    <option value="Facilities">Facilities &amp; Laboratories</option>
+                    <option value="Events">Events &amp; Celebrations</option>
+                    <option value="Achievements">Achievements &amp; Toppers</option>
+                    <option value="StudentActivities">Student Activities</option>
+                </select>
+            </div>
+
+            <form id="addImageForm" class="row g-2 mb-4">
+                <div class="col-sm-9">
+                    <label class="form-label" for="imageFilename">Image filename</label>
+                    <input id="imageFilename" class="form-control" type="text" placeholder="example.jpeg" required>
+                </div>
+                <div class="col-sm-3 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" type="submit"><i class="fa fa-plus me-2"></i>Add image</button>
+                </div>
+            </form>
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">Files in this gallery</h5>
+                <span id="imageCount" class="text-muted"></span>
+            </div>
+            <div id="imageList" class="gallery-admin__list mb-4"></div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button id="downloadManifest" class="btn btn-primary" type="button"><i class="fa fa-download me-2"></i>Download gallery-manifest.json</button>
+                <button id="resetManifest" class="btn btn-outline-secondary" type="button">Reset changes</button>
+            </div>
+            <p id="adminMessage" class="mt-3 text-muted" role="status"></p>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            var fallbackManifest = {
+                Gallery: ['gallery_1.jpeg', 'gallery_2.jpeg', 'gallery_3.jpeg', 'gallery_4.jpeg', 'gallery_5.jpeg', 'gallery_6.jpeg', 'gallery_7.jpeg', 'gallery_8.jpeg', 'gallery_9.jpeg', 'gallery_10.jpeg', 'gallery_11.jpeg', 'gallery_12.jpeg'],
+                CampusLife: ['IMG-20260716-WA0044.jpeg', 'IMG-20260719-WA0029.jpeg', 'IMG-20260719-WA0036.jpeg', 'IMG-20260722-WA0006.jpeg', 'IMG-20260722-WA0012.jpeg', 'IMG-20260914-WA0028.jpeg', 'IMG-20260914-WA0029.jpeg', 'IMG-20260914-WA0032.jpeg', 'IMG_20260722_005111.jpeg', 'IMG_20260722_133302.jpeg', 'IMG_20260914_182754.jpeg', 'kuldeep.jpeg', 'mamta.jpeg', 'monu.jpeg', 'Snapchat-437944203.jpeg', 'Snapchat-550441717.jpeg', 'Snapchat-668357809.jpeg'],
+                Facilities: [],
+                Events: [],
+                Achievements: ['kuldeep.jpeg', 'mamta.jpeg', 'monu.jpeg', 'soni.jpeg'],
+                StudentActivities: []
+            };
+            var manifest = {};
+            var category = document.getElementById('galleryCategory');
+            var list = document.getElementById('imageList');
+            var count = document.getElementById('imageCount');
+            var message = document.getElementById('adminMessage');
+
+            function cloneManifest(source) {
+                return JSON.parse(JSON.stringify(source));
+            }
+
+            function render() {
+                var files = manifest[category.value] || [];
+                count.textContent = files.length + ' image' + (files.length === 1 ? '' : 's');
+                if (!files.length) {
+                    list.innerHTML = '<div class="gallery-admin__empty">No filenames added yet.</div>';
+                    return;
+                }
+                list.innerHTML = files.map(function (filename, index) {
+                    return '<div class="gallery-admin__item"><span>' + filename + '</span><button class="btn btn-sm btn-outline-danger" type="button" data-remove="' + index + '"><i class="fa fa-trash"></i><span class="visually-hidden">Remove ' + filename + '</span></button></div>';
+                }).join('');
+                list.querySelectorAll('[data-remove]').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        files.splice(Number(button.getAttribute('data-remove')), 1);
+                        render();
+                        message.textContent = 'Change made locally. Download the JSON when finished.';
+                    });
+                });
+            }
+
+            function downloadManifest() {
+                var blob = new Blob([JSON.stringify(manifest, null, 2) + '\n'], { type: 'application/json' });
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'gallery-manifest.json';
+                link.click();
+                URL.revokeObjectURL(link.href);
+                message.textContent = 'Downloaded. Replace the old gallery-manifest.json in your Cloudflare upload.';
+            }
+
+            document.getElementById('addImageForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var input = document.getElementById('imageFilename');
+                var filename = input.value.trim();
+                if (filename && manifest[category.value].indexOf(filename) === -1) {
+                    manifest[category.value].push(filename);
+                    manifest[category.value].sort(function (first, second) { return first.localeCompare(second); });
+                    input.value = '';
+                    render();
+                    message.textContent = 'Change made locally. Download the JSON when finished.';
+                }
+            });
+            category.addEventListener('change', render);
+            document.getElementById('downloadManifest').addEventListener('click', downloadManifest);
+            document.getElementById('resetManifest').addEventListener('click', function () {
+                manifest = cloneManifest(fallbackManifest);
+                render();
+                message.textContent = 'Changes reset to the current manifest.';
+            });
+
+            fetch('gallery-manifest.json', { cache: 'no-store' })
+                .then(function (response) { return response.ok ? response.json() : Promise.reject(new Error('Manifest unavailable')); })
+                .then(function (loadedManifest) {
+                    manifest = loadedManifest;
+                    render();
+                })
+                .catch(function () {
+                    manifest = cloneManifest(fallbackManifest);
+                    render();
+                });
+        }());
+    </script>
+</body>
+</html>
